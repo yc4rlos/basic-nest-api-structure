@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as shortid from 'shortid';
 import { HttpException } from '@nestjs/common';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {

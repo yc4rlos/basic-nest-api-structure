@@ -5,12 +5,12 @@ import { newDb } from 'pg-mem';
 export async function providerConnection(entities: EntityClassOrSchema[]): Promise<any[]> {
     try {
 
-        // Cria o banco em memória
+        // Create the database in memory
         const db = newDb({
             autoCreateForeignKeyIndices: true
         });
 
-        // Registra as funções faltantes
+        // Register Functions
         db.public.registerFunction({
             implementation: () => 'test',
             name: 'current_database',
@@ -20,17 +20,17 @@ export async function providerConnection(entities: EntityClassOrSchema[]): Promi
             name: 'version',
         });
 
-        // Cria a connection Typeorm com as entities fornecidas
+        // Create the Typeorm Connection with the provided entities
         const connection = await db.adapters.createTypeormConnection({
             type: 'postgres',
             entities: [...entities]
         });
 
-        // Cria as tabelas
+        // Create the tables
         await connection.synchronize();
         let providers: { provide: any, useValue: any }[] = [];
 
-        // Para cada entity cria um objeto de provider correnspondente
+        // For each entity creates a provider
         for (let entity of entities) {
 
             const token = getRepositoryToken(entity as any);
@@ -41,7 +41,7 @@ export async function providerConnection(entities: EntityClassOrSchema[]): Promi
                 useValue: repository
             });
         }
-        // retorna os providers prontos para uso
+        // return the providers
         return providers;
     } catch (err) {
         throw new Error(`Cant create database, error: ${err}`);

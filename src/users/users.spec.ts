@@ -8,6 +8,8 @@ import * as request from 'supertest';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MailService } from '../mail/mail.service';
+import { MailerModule } from '@nestjs-modules/mailer/dist';
 
 describe('UsersController', () => {
   let app: INestApplication;
@@ -18,8 +20,25 @@ describe('UsersController', () => {
     const databaseProviders = await providerConnection([User]);
 
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        MailerModule.forRoot({
+          transport: {
+            host: process.env.MAILHOST,
+            port: process.env.MAILPORT,
+            ignoreTLS: true,
+            secure: false,
+            auth: {
+              user: process.env.MAILUSER,
+              pass: process.env.MAILPASSWORD,
+            },
+          },
+          defaults: {
+            from: '"nest-modules" <modules@nestjs.com>',
+          }
+        })
+      ],
       controllers: [UsersController],
-      providers: [UsersService, ...databaseProviders],
+      providers: [UsersService, MailService, ...databaseProviders],
     }).compile();
 
     app = module.createNestApplication();
