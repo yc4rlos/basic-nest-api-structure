@@ -1,28 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Put, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClassSerializerInterceptor } from '@nestjs/common/serializer';
 import { ParseIntPipe } from '@nestjs/common/pipes';
 import { UserDto } from './dto/user.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 
 @Controller('users')
 @ApiTags('Users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly _usersService: UsersService) { }
 
   @Post()
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiResponse({ status: 200, description: 'User Created With success.', type: UserDto })
   @ApiResponse({ status: 400, description: 'Provided invalid data.' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   create(@Body() createUserDto: CreateUserDto) {
     return this._usersService.create(createUserDto);
   }
 
   @Get()
   @ApiResponse({ status: 200, description: 'Users getted with success.', type: [UserDto] })
-  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll() {
     return this._usersService.findAll();
   }
@@ -30,14 +34,17 @@ export class UsersController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'User getted with success.', type: UserDto })
   @ApiResponse({ status: 400, description: 'Provided invalid ID' })
-  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findOne(@Param('id', ParseIntPipe) id: string) {
-    return this._usersService.findOne(+id);
+    return this._usersService.findOne({ id: +id });
   }
 
   @Patch('/restore/:id')
   @ApiResponse({ status: 200, description: 'User restored with success.' })
   @ApiResponse({ status: 400, description: 'Provided invalid ID.' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   restore(@Param('id', ParseIntPipe) id: string) {
     return this._usersService.restore(+id);
   }
@@ -46,8 +53,19 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User updated with success.', type: UserDto })
   @ApiResponse({ status: 400, description: 'Provided Invalid data or ID' })
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   update(@Param('id', ParseIntPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
     return this._usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(':id')
+  @ApiResponse({ status: 200, description: 'User deleted with Success.' })
+  @ApiResponse({ status: 400, description: 'Provided invalid ID.' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  remove(@Param('id', ParseIntPipe) id: string) {
+    return this._usersService.remove(+id);
   }
 
   @Put('/recoverPassword')
@@ -62,12 +80,5 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Provided Invalid token.' })
   resetPassword(@Param('token') token: string, @Body() data: { password: string }) {
     return this._usersService.resetPassword(token, data.password);
-  }
-
-  @Delete(':id')
-  @ApiResponse({ status: 200, description: 'User deleted with Success.' })
-  @ApiResponse({ status: 400, description: 'Provided invalid ID.' })
-  remove(@Param('id', ParseIntPipe) id: string) {
-    return this._usersService.remove(+id);
   }
 }

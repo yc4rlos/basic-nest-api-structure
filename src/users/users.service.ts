@@ -31,9 +31,9 @@ export class UsersService {
     return resp;
   }
 
-  public async findOne(id: number): Promise<UserDto> {
+  public async findOne(param: unknown): Promise<UserDto> {
 
-    const resp = await this._userRepository.findOne({ where: { id } });
+    const resp = await this._userRepository.findOne({ where: param });
     return new UserDto(resp);
   }
 
@@ -57,7 +57,7 @@ export class UsersService {
   public async comparePassword(email: string, password: string): Promise<boolean> {
     const user = await this._userRepository.findOne({ where: { email } });
     if (user) {
-      return bcrypt.compare(user.password, password);
+      return await bcrypt.compare(password, user.password);
     } else {
       return false;
     }
@@ -71,7 +71,7 @@ export class UsersService {
       await this._userRepository.update({ email }, { recoverToken: token });
       return { status: 'Email sent.' }
     } else {
-      return new HttpException('User not finded', 400);
+      throw new HttpException('User not finded', 400);
     }
   }
 
@@ -81,7 +81,7 @@ export class UsersService {
       user.password = password;
       return this._userRepository.update({ recoverToken: token }, user);
     } else {
-      return new HttpException('Invalid token', 400);
+      throw new HttpException('Invalid token', 400);
     }
   }
 }

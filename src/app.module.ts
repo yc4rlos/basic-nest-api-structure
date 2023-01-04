@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -49,8 +50,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
       ttl: 60,
       limit: 3
     }),
-    
-    UsersModule
+
+    UsersModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

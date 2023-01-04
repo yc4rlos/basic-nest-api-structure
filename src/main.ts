@@ -15,6 +15,7 @@ async function bootstrap() {
 
   // Open API
   const config = new DocumentBuilder()
+    .addSecurity('bearer', {type: 'http', scheme: 'bearer'})
     .setTitle('Base Project')
     .setDescription('A basic API')
     .setVersion('1.0')
