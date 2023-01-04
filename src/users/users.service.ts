@@ -41,9 +41,7 @@ export class UsersService {
 
     const { password, ...user } = updateUserDto
     await this._userRepository.update(id, user);
-    const resp = await this._userRepository.findOne({ where: { id } });
-
-    return new UserDto(resp);
+    return this.findOne({ id });
   }
 
   public remove(id: number): Promise<any> {

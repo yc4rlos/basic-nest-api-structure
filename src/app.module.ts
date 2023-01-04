@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
+import { AttachmentsModule } from './attachments/attachments.module';
 
 @Module({
   imports: [
@@ -31,13 +32,13 @@ import { AuthModule } from './auth/auth.module';
     // Node Mailer Config
     MailerModule.forRoot({
       transport: {
-        host: process.env.MAILHOST,
-        port: process.env.MAILPORT,
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
         ignoreTLS: true,
         secure: false,
         auth: {
-          user: process.env.MAILUSER,
-          pass: process.env.MAILPASSWORD,
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASSWORD,
         },
       },
       defaults: {
@@ -52,7 +53,8 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     UsersModule,
-    AuthModule
+    AuthModule,
+    AttachmentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

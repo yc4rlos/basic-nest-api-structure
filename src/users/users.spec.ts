@@ -23,13 +23,13 @@ describe('UsersController', () => {
       imports: [
         MailerModule.forRoot({
           transport: {
-            host: process.env.MAILHOST,
-            port: process.env.MAILPORT,
+            host: process.env.MAIL_HOST,
+            port: process.env.MAIL_PORT,
             ignoreTLS: true,
             secure: false,
             auth: {
-              user: process.env.MAILUSER,
-              pass: process.env.MAILPASSWORD,
+              user: process.env.MAIL_USER,
+              pass: process.env.MAIL_PASSWORD,
             },
           },
           defaults: {

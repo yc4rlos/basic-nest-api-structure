@@ -13,10 +13,10 @@ export class MailService {
             try {
                 await this._mailerService.sendMail({
                     to: email,
-                    from: process.env.MAILUSER,
+                    from: process.env.MAIL_USER,
                     subject: `Password Recover`,
                     html: `<strong>Recover your password</strong>
-                            <a>${process.env.APIURL}/restorePassword/${token}</a>`
+                            <a>${process.env.API_URL}/restorePassword/${token}</a>`
                 });
                 resolve(true);
             } catch (err) {

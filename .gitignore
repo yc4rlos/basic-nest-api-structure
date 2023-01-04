@@ -30,6 +30,9 @@ lerna-debug.log*
 # Environment Variables
 .env
 
+# Attachments uploaded
+/uploads
+
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
