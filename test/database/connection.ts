@@ -28,7 +28,7 @@ export async function providerConnection(entities: EntityClassOrSchema[]): Promi
 
         // Cria as tabelas
         await connection.synchronize();
-        let providers = [];
+        let providers: { provide: any, useValue: any }[] = [];
 
         // Para cada entity cria um objeto de provider correnspondente
         for (let entity of entities) {
