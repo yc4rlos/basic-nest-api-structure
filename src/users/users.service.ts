@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -9,11 +9,14 @@ import * as bcrypt from 'bcrypt';
 import * as shortid from 'shortid';
 import { HttpException } from '@nestjs/common';
 import { MailService } from '../mail/mail.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class UsersService {
 
   constructor(
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: Logger,
     @InjectRepository(User) private readonly _userRepository: Repository<User>,
     private readonly _mailService: MailService
   ) { }
@@ -64,10 +67,17 @@ export class UsersService {
   public async recoverPassword(email: string) {
     const user = await this._userRepository.findOne({ where: { email } })
     if (user) {
-      const token = shortid.generate();
-      await this._mailService.passwordRecover(email, token);
-      await this._userRepository.update({ email }, { recoverToken: token });
-      return { status: 'Email sent.' }
+      try {
+        const token = shortid.generate();
+        await this._mailService.passwordRecover(email, token);
+        await this._userRepository.update({ email }, { recoverToken: token });
+        return { status: 'Email sent.' }
+
+      } catch (err) {
+
+        this.logger.error(err.message, UsersService.name);
+        throw new InternalServerErrorException();
+      }
     } else {
       throw new HttpException('User not finded', 400);
     }
@@ -76,8 +86,15 @@ export class UsersService {
   public async resetPassword(token, password: string) {
     const user = await this._userRepository.findOne({ where: { recoverToken: token } });
     if (user) {
-      user.password = password;
-      return this._userRepository.update({ recoverToken: token }, user);
+      try {
+        user.password = password;
+        return this._userRepository.update({ recoverToken: token }, user);
+
+      } catch (err) {
+        
+        this.logger.error(err.message, UsersService.name);
+        throw new InternalServerErrorException();
+      }
     } else {
       throw new HttpException('Invalid token', 400);
     }

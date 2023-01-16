@@ -117,27 +117,13 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Email to recover sent.', type: UserDto })
   @ApiResponse({ status: 400, description: 'Provided Invalid email.' })
   async recoverPassword(@Body() data: { email: string }) {
-    try {
-      return await this._usersService.recoverPassword(data.email);
-
-    } catch (err) {
-
-      this.logger.error(err.message, UsersController.name);
-      throw new InternalServerErrorException();
-    }
+    return await this._usersService.recoverPassword(data.email);
   }
 
   @Put('/recoverPassword/:token')
   @ApiResponse({ status: 200, description: 'Password updated.', type: UserDto })
   @ApiResponse({ status: 400, description: 'Provided Invalid token.' })
   async resetPassword(@Param('token') token: string, @Body() data: { password: string }) {
-    try {
-      return await this._usersService.resetPassword(token, data.password);
-
-    } catch (err) {
-
-      this.logger.error(err.message, UsersController.name);
-      throw new InternalServerErrorException();
-    }
+    return await this._usersService.resetPassword(token, data.password);
   }
 }
