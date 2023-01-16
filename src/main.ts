@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger/dist';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,12 +11,15 @@ async function bootstrap() {
   // Cors
   app.enableCors();
 
+  // Winston
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
+
   // Global Pipes
   app.useGlobalPipes(new ValidationPipe())
 
   // Open API
   const config = new DocumentBuilder()
-    .addSecurity('bearer', {type: 'http', scheme: 'bearer'})
+    .addSecurity('bearer', { type: 'http', scheme: 'bearer' })
     .setTitle('Base Project')
     .setDescription('A basic API')
     .setVersion('1.0')
