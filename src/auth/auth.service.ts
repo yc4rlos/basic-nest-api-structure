@@ -26,7 +26,7 @@ export class AuthService {
                 return { token };
             } catch (err) {
 
-                this.logger.log(err.message, AuthService.name);
+                this.logger.log(err.message, "AuthService");
                 throw new InternalServerErrorException();
             }
         } else {

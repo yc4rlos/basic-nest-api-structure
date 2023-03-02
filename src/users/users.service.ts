@@ -22,45 +22,86 @@ export class UsersService {
   ) { }
 
   public async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    const user = await this._userRepository.create(createUserDto);
-    const resp = await this._userRepository.save(user);
-    return new UserDto(resp);
+    try{
+      const user = this._userRepository.create(createUserDto);
+      const resp = await this._userRepository.save(user);
+      return new UserDto(resp);
+
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
+    }
   }
 
   public async findAll(): Promise<UserDto[]> {
-    const users = await this._userRepository.find();
-    let resp = [];
-    users.forEach(user => resp.push(new UserDto(user)));
-    return resp;
+    try{
+      const users = await this._userRepository.find();
+      let resp = [];
+      users.forEach(user => resp.push(new UserDto(user)));
+      return resp;
+
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
+    }
   }
 
   public async findOne(param: unknown): Promise<UserDto> {
+    try{
+      const resp = await this._userRepository.findOne({ where: param });
+      return new UserDto(resp);
 
-    const resp = await this._userRepository.findOne({ where: param });
-    return new UserDto(resp);
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
+    }
   }
 
   public async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
-
+  try{
     const { password, ...user } = updateUserDto
     await this._userRepository.update(id, user);
     return this.findOne({ id });
+
+  }catch(err){
+  this.logger.log(err.message, "UsersService")
+  throw new InternalServerErrorException();
+
+  }
   }
 
-  public remove(id: number): Promise<any> {
-    return this._userRepository.softDelete(id);
+  public async remove(id: number): Promise<any> {
+    try{
+      return await this._userRepository.softDelete(id);
+
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
+    }
   }
 
-  public restore(id: number): Promise<any> {
-    return this._userRepository.restore(id);
+  public async restore(id: number): Promise<any> {
+    try{
+      return await this._userRepository.restore(id);
+
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
+    }
   }
 
   public async comparePassword(email: string, password: string): Promise<boolean> {
-    const user = await this._userRepository.findOne({ where: { email } });
-    if (user) {
-      return await bcrypt.compare(password, user.password);
-    } else {
-      return false;
+    try{
+
+      const user = await this._userRepository.findOne({ where: { email } });
+      if (user) {
+        return await bcrypt.compare(password, user.password);
+      } else {
+        return false;
+      }
+    }catch(err){
+      this.logger.log(err.message, "UsersService")
+      throw new InternalServerErrorException();
     }
   }
 
@@ -75,7 +116,7 @@ export class UsersService {
 
       } catch (err) {
 
-        this.logger.error(err.message, UsersService.name);
+        this.logger.error(err.message, "UsersService");
         throw new InternalServerErrorException();
       }
     } else {
@@ -92,7 +133,7 @@ export class UsersService {
 
       } catch (err) {
         
-        this.logger.error(err.message, UsersService.name);
+        this.logger.error(err.message, "UsersService");
         throw new InternalServerErrorException();
       }
     } else {
