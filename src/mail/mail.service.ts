@@ -1,5 +1,6 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
+import { config } from "src/config/config";
 
 @Injectable()
 export class MailService {
@@ -13,10 +14,10 @@ export class MailService {
             try {
                 await this._mailerService.sendMail({
                     to: email,
-                    from: process.env.MAIL_USER,
+                    from: config().mail.auth.user,
                     subject: `Password Recover`,
                     html: `<strong>Recover your password</strong>
-                            <a>${process.env.API_URL}/restorePassword/${token}</a>`
+                            <a>${config().apiUrl}/restorePassword/${token}</a>`
                 });
                 resolve(true);
             } catch (err) {

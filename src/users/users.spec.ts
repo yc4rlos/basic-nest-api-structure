@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from '../mail/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer/dist';
+import { config } from 'src/config/config';
 
 describe('UsersController', () => {
   let app: INestApplication;
@@ -23,14 +24,10 @@ describe('UsersController', () => {
       imports: [
         MailerModule.forRoot({
           transport: {
-            host: process.env.MAIL_HOST,
-            port: process.env.MAIL_PORT,
+            ...config().mail,
             ignoreTLS: true,
             secure: false,
-            auth: {
-              user: process.env.MAIL_USER,
-              pass: process.env.MAIL_PASSWORD,
-            },
+            
           },
           defaults: {
             from: '"nest-modules" <modules@nestjs.com>',

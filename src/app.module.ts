@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { config } from './config/config';
 
 @Module({
   imports: [
@@ -21,12 +22,9 @@ import * as winston from 'winston';
 
     // TypeOrm Config
     TypeOrmModule.forRoot({
+      ...config().database,
       type: 'postgres',
       port: 5432,
-      host: process.env.DATABASE_HOST,
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
       synchronize: true,
       autoLoadEntities: true
     }),
@@ -34,14 +32,9 @@ import * as winston from 'winston';
     // Node Mailer Config
     MailerModule.forRoot({
       transport: {
-        host: process.env.MAIL_HOST,
-        port: process.env.MAIL_PORT,
+        ...config().mail,
         ignoreTLS: true,
         secure: false,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
-        },
       },
       defaults: {
         from: '"nest-modules" <modules@nestjs.com>',
